@@ -7,9 +7,9 @@ import epetitions as E
 # Create a metric to track time spent and requests made.
 SIGNATURES = Gauge('signatures',
                    'Number of signatures for this petition', [
-                       "id", "name", "created"])
-SIG_REQUEST_TIME = Summary('signature_request_time',
-                           'Time this request took to process')
+                       "id", "name", "created", "status"])
+SIG_REQUEST_TIME = Gauge('signature_request_time',
+                         'Time this request took to process')
 
 
 @ SIG_REQUEST_TIME.time()
@@ -20,7 +20,9 @@ def get_signatures():
         SIGNATURES.labels(
             id=sig.identifier,
             name=sig.label,
-            created=datetime.fromisoformat(sig.created.replace("Z", "+00:00")).timestamp()).set(
+            created=datetime.fromisoformat(
+                sig.created.replace("Z", "+00:00")).timestamp(),
+            status=sig.status).set(
             sig.numberOfSignatures
         )
 
@@ -32,4 +34,4 @@ if __name__ == '__main__':
     # Generate some requests.
     while True:
         get_signatures()
-        time.sleep(3600)
+        time.sleep(600)
