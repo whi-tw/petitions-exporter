@@ -24,12 +24,14 @@ def do_json_request(url: str, params={}) -> json:
     return req.json()
 
 
-def get_all() -> json:
+def get_all(params={}) -> json:
     result = []
     next_page = "{}/epetitions.json".format(
         EPETITIONS_BASEURL)
+    if not "_pageSize" in params.keys():
+        params["_pageSize"] = 500
     while next_page != "":
-        req = do_json_request(url=next_page, params={"_pageSize": 500})
+        req = do_json_request(url=next_page, params=params)
         result += req["result"]["items"]
         try:
             next_page = req["result"]["next"]
