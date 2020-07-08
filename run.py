@@ -13,8 +13,11 @@ SIG_REQUEST_TIME = Gauge('signature_request_time',
 
 
 @ SIG_REQUEST_TIME.time()
-def get_signatures():
-    sigs = E.get_all()
+def get_signatures(include_closed=False):
+    params = {}
+    if not include_closed:
+        params = {"status": "open"}
+    sigs = E.get_all(params)
     for sig in sigs:
         sig = E.parse_petition(sig)
         SIGNATURES.labels(
@@ -32,6 +35,8 @@ if __name__ == '__main__':
     # Start up the server to expose the metrics.
     start_http_server(8000)
     # Generate some requests.
+    get_signatures(True)
+    time.sleep(600)
     while True:
         get_signatures()
         time.sleep(600)
